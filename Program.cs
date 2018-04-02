@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace adventofcode2017
 {
@@ -6,7 +7,7 @@ namespace adventofcode2017
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Day1.Run();
         }
     }
 }
