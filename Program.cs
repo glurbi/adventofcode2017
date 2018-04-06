@@ -7,7 +7,7 @@ namespace adventofcode2017
     {
         static void Main(string[] args)
         {
-            Day2.Run2();
+            Day3.Run2();
         }
     }
 }
