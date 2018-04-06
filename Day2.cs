@@ -23,7 +23,7 @@ namespace adventofcode2017
 2290	157	2759	3771	4112	2063	153	3538	3740	130	3474	1013	180	2164	170	189
 525	1263	146	954	188	232	1019	918	268	172	1196	1091	1128	234	650	420";
 
-        internal static void Run()
+        internal static void Run1()
         {
             var sum = 0;
             using (var reader = new StringReader(input))
@@ -39,5 +39,30 @@ namespace adventofcode2017
             }
             Console.WriteLine(sum);
         }
+
+        internal static void Run2()
+        {
+            var sum = 0;
+
+            using (var reader = new StringReader(input))
+            {
+                var l = "";
+                while ((l = reader.ReadLine()) != null)
+                {
+                    var numbers = l.Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                   .Select(s => int.Parse(s));
+                    foreach (var n in numbers)
+                    {
+                        foreach (var n1 in numbers)
+                        {
+                            if ((n1 != n) && (n1 % n == 0))
+                                sum += n1 / n;
+                        }
+                    }
+                }
+            }
+            Console.WriteLine(sum);
+        }
+
     }
 }
