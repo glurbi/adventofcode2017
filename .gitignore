@@ -1,2 +1,4 @@
 obj/
 bin/
+/target
+**/*.rs.bk
