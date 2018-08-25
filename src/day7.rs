@@ -3,7 +3,7 @@ use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 use regex::Regex;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Prog {
     name: String,
     weight: i32,
@@ -37,15 +37,15 @@ pub fn day7() {
         }
 
         let prog = Prog { name: name.to_string(), weight, children };
-        println!("{:?}", captures);
-        println!("{:?}", prog);
+        //println!("{:?}", captures);
+        //println!("{:?}", prog);
         progs.insert(name.to_string(), prog);
     }
 
     let mut opt = Some(relations.iter().next().unwrap().0);
     let mut bottom = "nil".to_string();
     loop {
-        println!("{:?}", opt);
+        //println!("{:?}", opt);
         match opt {
             Some(name) => {
                 opt = relations.get(name);
@@ -55,4 +55,62 @@ pub fn day7() {
         } 
     }
     println!("{:?}", bottom);
+
+    let mut refs: Vec<&Prog> = Vec::new();
+    let mut idx: Vec<usize> = Vec::new();
+    refs.push(progs.get(&bottom).unwrap());
+    idx.push(0);
+    //println!("{:?}", refs);
+    while !refs.is_empty() {
+        let prog = refs.last().unwrap().clone();
+        let i = *idx.last().unwrap();
+        if prog.children.len() == i {
+            if i > 0 {
+                let child_progs = prog.children.iter().map(|child| progs.get(&child.to_string()).unwrap()).collect();
+                let tower_weights = tower_weights(&child_progs, &progs);
+                let all_same = tower_weights.iter().all(|&w| w == tower_weights[0]);
+                if !all_same {
+                    let child_weights: Vec<i32> = child_progs.iter().map(|prog| prog.weight).collect();
+                    println!("{:?},{:?},{:?},{}",prog,tower_weights,child_weights,all_same);
+                    break;
+                }
+            }
+            refs.pop();
+            idx.pop();
+        } else {
+            let new_i = idx.pop().unwrap() + 1;
+            idx.push(new_i);
+            refs.push(progs.get(&prog.children[i]).unwrap());
+            idx.push(0);
+        }
+    }
+}
+
+fn tower_weights(roots: &Vec<&Prog>, progs: &HashMap<String,Prog>) -> Vec<i32> {
+    roots.iter().map(|&root| tower_weight(root, &progs)).collect()
+}
+
+fn tower_weight(root: &Prog, progs: &HashMap<String,Prog>) -> i32 {
+    let mut refs: Vec<&Prog> = Vec::new();
+    let mut idx: Vec<usize> = Vec::new();
+    refs.push(&root);
+    idx.push(0);
+    let mut sum = 0;
+    let mut acc: Vec<i32> = Vec::new();
+    while !refs.is_empty() {
+        let prog = refs.last().unwrap().clone();
+        let i = *idx.last().unwrap();
+        if prog.children.len() == i {
+            acc.push(prog.weight);
+            sum += prog.weight;
+            refs.pop();
+            idx.pop();
+        } else {
+            let new_i = idx.pop().unwrap() + 1;
+            idx.push(new_i);
+            refs.push(progs.get(&prog.children[i]).unwrap());
+            idx.push(0);
+        }
+    }
+    sum
 }
