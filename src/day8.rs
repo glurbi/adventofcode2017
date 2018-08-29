@@ -54,6 +54,7 @@ impl Day8 {
 
     pub fn run(&mut self) {
         self.load("input/day8.txt");
+        let mut highest = 0;
         for instruction in &self.instructions {
             let reg_cmp = &instruction.reg_cmp;
             let val_cmp = instruction.val_cmp;
@@ -74,9 +75,13 @@ impl Day8 {
                 INC => self.regs.entry(reg).and_modify(|v| *v += val),
                 DEC => self.regs.entry(reg).and_modify(|v| *v -= val),
             };
+            if self.regs[&instruction.reg] > highest {
+                highest = self.regs[&instruction.reg];
+            }
         }
         let max = self.regs.values().max().unwrap();
         println!("max = {}", max);
+        println!("highest = {}", highest);
     }
 
     fn load(&mut self, file: &str) {
