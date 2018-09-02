@@ -33,9 +33,10 @@ pub fn day9() {
     for ex in examples {
         println!("----------------");
         let mut score = 0;
+        let mut garbage = 0;
         let pairs = StreamParser::parse(Rule::stream, ex).unwrap_or_else(|e| panic!("{}", e));
-        visit(pairs, 1, &mut score);
-        println!("{} -> {}", ex, score);
+        visit(pairs, 1, &mut score, &mut garbage);
+        println!("{} -> {}, {}", ex, score, garbage);
     }
 
     let file_name = "input/day9.txt";
@@ -47,15 +48,24 @@ pub fn day9() {
 
     println!("----------------");
     let mut score = 0;
+    let mut garbage = 0;
     let pairs = StreamParser::parse(Rule::stream, &stream).unwrap_or_else(|e| panic!("{}", e));
-    visit(pairs, 1, &mut score);
-    println!("{} -> {}", "...", score);
-
+    visit(pairs, 1, &mut score, &mut garbage);
+    println!("{} -> {}, {}", "...", score, garbage);
 }
 
-fn visit(pairs: Pairs<Rule>, depth: i32, score: &mut i32) {
+fn visit(pairs: Pairs<Rule>, depth: i32, score: &mut i32, garbage: &mut i32) {
     for pair in pairs {
-        *score += depth;
-        visit(pair.into_inner(), depth + 1, score);
+        match pair.as_rule() {
+            Rule::group => {
+                *score += depth;
+                visit(pair.into_inner(), depth + 1, score, garbage);
+            },
+            Rule::not_escape => {
+                *garbage += 1;
+                continue;
+            },
+            _ => unreachable!()
+        };
     }
 }
