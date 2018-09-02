@@ -1,0 +1,13 @@
+escape = _{ "!" ~ any }
+
+not_escape = _{ !( "!" | ">" ) ~ any }
+
+garbage_content = _{ (escape | not_escape)* }
+
+garbage = _{ "<" ~ garbage_content  ~ ">" }
+
+thing = _{ group | garbage }
+
+group = { "{" ~ (thing ~ ",")* ~ thing* ~ "}" }
+
+stream = _{ soi ~ group ~ eoi }
