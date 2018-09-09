@@ -20,7 +20,6 @@ enum Direction {
 
 use day11::Direction::*;
 
-
 fn day11_1() {
     println!("{}", distance("ne,ne,ne"));
     println!("{}", distance("ne,ne,sw,sw"));
@@ -116,7 +115,7 @@ fn simplify(dirs: &HashMap<Direction, i32>) -> HashMap<Direction, i32> {
     res
 }
 
-fn split(dirs: &Vec<Direction>) -> HashMap<Direction, i32> {
+fn split(dirs: &[Direction]) -> HashMap<Direction, i32> {
     let mut res = HashMap::new();
     res.insert(N, 0);
     res.insert(NE, 0);
@@ -146,6 +145,24 @@ fn load(input: &str) -> Vec<Direction> {
 }
 
 fn day11_2() {
+    let file_name = "input/day11.txt";
+    let err_open = format!("Failed to open {}", &file_name);
+    let mut file = File::open(file_name).expect(&err_open);
+    let mut input = String::new();
+    let err_read = format!("Failed to read {}", &file_name);
+    file.read_to_string(&mut input).expect(&err_read);
 
+    let mut max_d = 0;
+    let dirs = load(&input);
+    for i in 1..dirs.len() {
+        //println!("{:?}", &dirs[0..i]);
+        let split = split(&dirs[0..i]);
+        let res = simplify(&split);
+        let d: i32 = res.values().sum();
+        if d > max_d {
+            println!("{:?} -> {}", res, d);
+            max_d = d;
+        }
+    }
 }
 
