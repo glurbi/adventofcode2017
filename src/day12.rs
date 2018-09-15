@@ -45,6 +45,19 @@ impl Graph {
             }
         }
     }
+
+    fn group_count(&self) -> i32 {
+        let mut visited = HashSet::new();
+        let mut count = 0;
+        for n in self.nodes.keys() {
+            if !visited.contains(n) {
+                count += 1;
+                let g = self.group(&n);
+                visited.extend(g.into_iter());
+            }
+        }
+        count
+    }
 }
 
 pub fn day12() {
@@ -86,6 +99,13 @@ fn day12_1() {
 }
 
 fn day12_2() {
+    let input = read_to_string("input/Day12-test.txt");
+    let graph = create_graph(&input);
+    println!("{}", graph.group_count());
+
+    let input = read_to_string("input/Day12.txt");
+    let graph = create_graph(&input);
+    println!("{}", graph.group_count());
 }
 
 fn read_to_string(file_name: &str) -> String {
