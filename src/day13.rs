@@ -54,20 +54,36 @@ impl Firewall {
             severity += self.current_severity();
             //println!("{}", severity);
             self.move_packet();
-            self.move_scanner();
+            self.move_scanner(1);
         }
         severity
+    }
+
+    fn until_no_severity(firewall: &Firewall) {
+        let mut delay = 0;
+        for _ in 0..20 {
+            let mut f = firewall.clone();
+            f.move_scanner(delay);
+            println!("{:?}", f);
+            let severity = f.total_severity();
+            println!("delay = {}, severity = {}", delay, severity);
+            delay += 1;
+
+            //if severity == 0 {
+            //    break;
+            //}
+        }
     }
 
     fn move_packet(&mut self) {
         self.packet_depth += 1;
     }
 
-    fn move_scanner(&mut self) {
+    fn move_scanner(&mut self, amount: usize) {
         for o in self.layers.iter_mut() {
             *o = match o {
                 Some(l) => Some(Layer {
-                     scanner_pos: (l.scanner_pos + 1) % l.range_mod,
+                     scanner_pos: (l.scanner_pos + amount) % l.range_mod,
                      range_orig: l.range_orig,
                      range_mod: l.range_mod,
                 }),
@@ -78,7 +94,7 @@ impl Firewall {
 }
 
 pub fn day13() {
-    day13_1();
+    //day13_1();
     day13_2();
 }
 
@@ -96,6 +112,13 @@ fn day13_1() {
 }
 
 fn day13_2() {
+    let input = read_to_string("input/Day13-test.txt");
+    let firewall = Firewall::load(&input);
+    Firewall::until_no_severity(&firewall);
+
+    //let input = read_to_string("input/Day13.txt");
+    //let firewall = Firewall::load(&input);
+    //Firewall::until_no_severity(&firewall);
 }
 
 fn read_to_string(file_name: &str) -> String {
