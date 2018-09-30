@@ -40,38 +40,80 @@ impl Firewall {
         firewall
     }
 
-    fn current_severity(&self) -> usize {
+    fn local_severity(&self) -> usize {
         match self.layers[self.packet_depth] {
             Some(l) => (l.scanner_pos == 0) as usize * self.packet_depth * l.range_orig,
             None => 0
         }
     }
 
+    fn local_caught(&self) -> bool {
+        match self.layers[self.packet_depth] {
+            Some(l) => l.scanner_pos == 0,
+            None => false,
+        }
+    }
+
+    fn is_caught(&self, depth: usize, delay: usize) -> bool {
+        //println!("delay = {}, depth = {}", delay, depth);
+        match self.layers[depth] {
+            Some(l) => (delay+depth) % l.range_mod == 0,
+            None => false,
+        }
+    }
+
     fn total_severity(&mut self) -> usize {
         let mut severity = 0;
-        for _ in 0..self.layers.len() {
+        self.move_scanner(1);
+        for _ in 0..self.layers.len()-1 {
             //println!("{:?}", self);
-            severity += self.current_severity();
             //println!("{}", severity);
             self.move_packet();
+            severity += self.local_severity();
             self.move_scanner(1);
         }
         severity
     }
 
-    fn until_no_severity(firewall: &Firewall) {
+    fn traverse(&mut self) -> bool {
+        for _ in 0..self.layers.len() {
+            //println!("{:?}", self);
+            //println!("{}", severity);
+            if self.local_caught() {
+                return true
+            }
+
+            self.move_packet();
+            self.move_scanner(1);
+        }
+        false
+    }
+
+    fn until_not_caught(firewall: &Firewall) {
         let mut delay = 0;
-        for _ in 0..20 {
+        loop {
             let mut f = firewall.clone();
             f.move_scanner(delay);
-            println!("{:?}", f);
-            let severity = f.total_severity();
-            println!("delay = {}, severity = {}", delay, severity);
+            //println!("{:?}", f);
+            let caught = f.traverse();
+            //println!("delay = {}, caught = {}", delay, caught);
             delay += 1;
 
-            //if severity == 0 {
-            //    break;
-            //}
+            if !caught {
+                break;
+            }
+        }
+    }
+
+    fn until_not_caught2(&self) {
+        let mut delay = 0;
+        loop {
+            let caught = (0..self.layers.len()).any(|depth| self.is_caught(depth, delay));
+            if !caught {
+                println!("delay = {}, caught = {}", delay, caught);
+                break;
+            }
+            delay += 1;
         }
     }
 
@@ -94,7 +136,7 @@ impl Firewall {
 }
 
 pub fn day13() {
-    //day13_1();
+    day13_1();
     day13_2();
 }
 
@@ -114,11 +156,11 @@ fn day13_1() {
 fn day13_2() {
     let input = read_to_string("input/Day13-test.txt");
     let firewall = Firewall::load(&input);
-    Firewall::until_no_severity(&firewall);
+    Firewall::until_not_caught2(&firewall);
 
-    //let input = read_to_string("input/Day13.txt");
-    //let firewall = Firewall::load(&input);
-    //Firewall::until_no_severity(&firewall);
+    let input = read_to_string("input/Day13.txt");
+    let firewall = Firewall::load(&input);
+    Firewall::until_not_caught2(&firewall);
 }
 
 fn read_to_string(file_name: &str) -> String {
