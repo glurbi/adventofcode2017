@@ -18,9 +18,9 @@ const S: i32 = 128;
 
 fn offset(x:i32, y:i32) -> usize {
     let x = if x < 0 { 0 } else { x };
-    let x = if x >= S { S } else { x };
+    let x = if x >= S { S-1 } else { x };
     let y = if y < 0 { 0 } else { y };
-    let y = if y >= S { S } else { y };
+    let y = if y >= S { S-1 } else { y };
     (y * S + x) as usize
 }
 
@@ -49,31 +49,32 @@ impl Disk {
 
     fn count_groups(&self) -> u32 {
         let mut visited = Vec::new();
+        visited.resize(self.bits.len(), false);
         let mut count = 0;
         for y in 0..S {
             for x in 0..S {
-                if visited[offset(x,y)] {
+                let offset = offset(x,y);
+                if self.bits[offset] == 0 || visited[offset] {
                     continue;
                 }
-                visited[offset(x,y)] = true;
-                if self.bits[offset(x,y)] == 0 {
-                    continue;
-                }
-                count += 1;
                 self.visit_group(x, y, &mut visited);
+                //println!("count={}", count);
+                count += 1;
             }
         }
         count
     }
 
     fn visit_group(&self, x:i32, y:i32, visited: &mut Vec<bool>) {
-        if visited[offset(x,y)] {
+        let offset = offset(x,y);
+        if visited[offset] {
             return;
         }
-        visited[offset(x,y)] = true;
-        if self.bits[offset(x,y)] == 0 {
+        visited[offset] = true;
+        if self.bits[offset] == 0 {
             return;
         }
+        //println!("{} {}", x, y);
         self.visit_group(x+1, y, visited);
         self.visit_group(x-1, y, visited);
         self.visit_group(x, y+1, visited);
@@ -96,7 +97,13 @@ fn day14_2() {
     let disk = Disk::from_key(key);
     //println!("{:?}", disk);
     let count = disk.count_groups();
-    println!("{}", count);
+    println!("groups={}", count);
+
+    let key = "hfdlxzhv";
+    let disk = Disk::from_key(key);
+    //println!("{:?}", disk);
+    let count = disk.count_groups();
+    println!("groups={}", count);
 }
 
 fn knot_hash(key: &str) -> String {
