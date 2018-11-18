@@ -93,6 +93,17 @@ fn day16_1() {
 
 fn day16_2() {
     println!("Part 2");
+
+    //let progs = String::from("abcde");
+    //let raw_moves = String::from("s1,x3/4,pe/b");
+    let progs = String::from("abcdefghijklmnop");
+    let raw_moves = read_to_string("input/Day16.txt");
+    let mut d16 = Day16::new(progs, raw_moves);
+    for _ in 0..1000 {
+        d16.dance();
+    }
+    println!("{:?}", d16);
+
 }
 
 fn read_to_string(file_name: &str) -> String {
