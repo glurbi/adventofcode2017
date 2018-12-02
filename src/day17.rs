@@ -19,9 +19,18 @@ fn part1() {
 }
 
 fn part2() {
-
     println!("Part 2");
-
+    let mut pos: usize = 0;
+    //println!("pos = {}", pos);
+    let steps: usize = 382;
+    for val in 1..50000000 {
+        pos = (pos + steps) % val + 1;
+        if pos == 1 {
+            println!("{}", val)
+        }
+    }
+    //println!("pos = {}", pos);
+    //println!("=> {}", buf[1]);
 }
 
 
