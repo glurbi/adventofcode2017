@@ -1,0 +1,2 @@
+# to run the rust compiler inside a docker container
+docker run --rm -it -v D:/Scratch/adventofcode2017:/adventofcode2017 rust:1.31
