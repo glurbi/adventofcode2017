@@ -1,4 +1,8 @@
-pub fn day6() {
+fn main() {
+    day6();
+}
+
+fn day6() {
     let mut mem = vec![ 11, 11, 13, 7, 0, 15, 5, 5, 4, 4, 1, 1, 7, 1, 15, 11 ];
     //let mut mem = vec![ 0, 2, 7, 0 ];
     let mut cycles = 0;

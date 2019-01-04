@@ -3,14 +3,22 @@ use std::io::prelude::*;
 use pest::Parser;
 use pest::iterators::Pairs;
 
+extern crate pest;
+#[macro_use]
+extern crate pest_derive;
+
+fn main() {
+    day9();
+}
+
 #[cfg(debug_assertions)]
-const _GRAMMAR: &'static str = include_str!("day9.pest");
+const _GRAMMAR: &'static str = include_str!("../day9.pest");
 
 #[derive(Parser)]
 #[grammar = "day9.pest"]
 pub struct StreamParser;
 
-pub fn day9() {
+fn day9() {
 
     let examples = vec![
         "{}",

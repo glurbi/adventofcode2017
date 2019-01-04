@@ -4,6 +4,10 @@ use std::iter;
 use std::fs::File;
 use std::io::prelude::*;
 
+fn main() {
+    day12();
+}
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Node {
     id: i32,

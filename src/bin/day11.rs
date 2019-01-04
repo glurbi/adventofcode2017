@@ -3,6 +3,10 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
 
+fn main() {
+    day11();
+}
+
 pub fn day11() {
     day11_1();
     day11_2();
@@ -18,7 +22,7 @@ enum Direction {
     NW,
 }
 
-use day11::Direction::*;
+use Direction::*;
 
 fn day11_1() {
     println!("{}", distance("ne,ne,ne"));

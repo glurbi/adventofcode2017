@@ -2,8 +2,12 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 
-use day8::Operation::{INC,DEC};
-use day8::Test::{LT,LTEQ,EQ,NEQ,GTEQ,GT};
+use Operation::{INC,DEC};
+use Test::{LT,LTEQ,EQ,NEQ,GTEQ,GT};
+
+fn main() {
+    day8();
+}
 
 #[derive(Debug)]
 enum Operation {
@@ -38,7 +42,7 @@ struct Day8 {
     regs: HashMap<String,i32>,
 }
 
-pub fn day8() {
+fn day8() {
     let mut day8 = Day8::new();
     day8.run();
 }

@@ -1,4 +1,8 @@
-pub fn day10() {
+fn main() {
+    day10();
+}
+
+fn day10() {
     day10_1();
     day10_2();
 }

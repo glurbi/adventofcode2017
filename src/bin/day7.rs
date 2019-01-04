@@ -1,7 +1,13 @@
+extern crate regex;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 use regex::Regex;
+
+fn main() {
+    day7();
+}
 
 #[derive(Debug, Clone)]
 struct Prog {
@@ -10,7 +16,7 @@ struct Prog {
     children: Vec<String>,
 }
 
-pub fn day7() {
+fn day7() {
     let mut progs: HashMap<String,Prog> = HashMap::new();
     let mut relations: HashMap<String,String> = HashMap::new();
     let file = File::open("input/day7.txt").expect("Failed to open day7.txt");
