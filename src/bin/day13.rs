@@ -1,6 +1,15 @@
 use std::fs::File;
 use std::io::prelude::*;
 
+fn main() {
+    day13();
+}
+
+fn day13() {
+    day13_1();
+    day13_2();
+}
+
 #[derive(Debug, Clone, Copy)]
 struct Layer {
     scanner_pos: usize,
@@ -47,13 +56,6 @@ impl Firewall {
         }
     }
 
-    fn local_caught(&self) -> bool {
-        match self.layers[self.packet_depth] {
-            Some(l) => l.scanner_pos == 0,
-            None => false,
-        }
-    }
-
     fn is_caught(&self, depth: usize, delay: usize) -> bool {
         //println!("delay = {}, depth = {}", delay, depth);
         match self.layers[depth] {
@@ -73,36 +75,6 @@ impl Firewall {
             self.move_scanner(1);
         }
         severity
-    }
-
-    fn traverse(&mut self) -> bool {
-        for _ in 0..self.layers.len() {
-            //println!("{:?}", self);
-            //println!("{}", severity);
-            if self.local_caught() {
-                return true
-            }
-
-            self.move_packet();
-            self.move_scanner(1);
-        }
-        false
-    }
-
-    fn until_not_caught(firewall: &Firewall) {
-        let mut delay = 0;
-        loop {
-            let mut f = firewall.clone();
-            f.move_scanner(delay);
-            //println!("{:?}", f);
-            let caught = f.traverse();
-            //println!("delay = {}, caught = {}", delay, caught);
-            delay += 1;
-
-            if !caught {
-                break;
-            }
-        }
     }
 
     fn until_not_caught2(&self) {
@@ -133,11 +105,6 @@ impl Firewall {
             };
         }
     }
-}
-
-pub fn day13() {
-    day13_1();
-    day13_2();
 }
 
 fn day13_1() {

@@ -1,5 +1,9 @@
-pub fn day14() {
-    //day14_1();
+fn main() {
+    day14();
+}
+
+fn day14() {
+    day14_1();
     day14_2();
 }
 

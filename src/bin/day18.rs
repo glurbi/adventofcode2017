@@ -271,12 +271,12 @@ fn part1() {
     let prog = Prog::from_text(&input);
     //println!("{:?}", prog);
     let mut vm = VirtualMachine::new(0);
-    prog.run(&mut vm);
+    prog.run(&mut vm).expect("Failed to run part 1 test");
 
     let input = read_to_string("input/Day18.txt");
     let prog = Prog::from_text(&input);
     let mut vm = VirtualMachine::new(0);
-    prog.run(&mut vm);
+    prog.run(&mut vm).expect("Failed to run part 1");
 }
 
 fn part2() {
@@ -286,7 +286,7 @@ fn part2() {
     let mut vm0 = VirtualMachine::new(0);
     let mut vm1 = VirtualMachine::new(1);
     *vm1.regs.entry('p').or_insert(0) = 1;
-    prog.run2(&mut vm0, &mut vm1);
+    prog.run2(&mut vm0, &mut vm1).expect("Failed to run part 2");
 }
 
 fn read_to_string(file_name: &str) -> String {
