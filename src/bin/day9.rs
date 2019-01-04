@@ -12,10 +12,10 @@ fn main() {
 }
 
 #[cfg(debug_assertions)]
-const _GRAMMAR: &'static str = include_str!("../day9.pest");
+const _GRAMMAR: &'static str = include_str!("../etc/day9.pest");
 
 #[derive(Parser)]
-#[grammar = "day9.pest"]
+#[grammar = "etc/day9.pest"]
 pub struct StreamParser;
 
 fn day9() {
