@@ -3,6 +3,8 @@ extern crate nom;
 
 use nom::{digit};
 
+const INPUT: &'static str = include_str!("../../input/Day20.txt");
+
 fn main() {
     day1();
 }
@@ -37,42 +39,44 @@ named!(
 ));
 
 named!(
-    position<&str, Vec3>,
+    vec3<&str, Vec3>,
     do_parse!(
-        tag!("p=<") >>
         x: integer >>
         tag!(",") >>
         y: integer >>
         tag!(",") >>
         z: integer >>
-        tag!(">") >>
         (Vec3 { x, y, z }))
+);
+
+named!(
+    position<&str, Vec3>,
+    do_parse!(
+        tag!("p=<") >>
+        v: vec3 >>
+        tag!(">") >>
+        (v)
+    )
 );
 
 named!(
     velocity<&str, Vec3>,
     do_parse!(
         tag!("v=<") >>
-        x: integer >>
-        tag!(",") >>
-        y: integer >>
-        tag!(",") >>
-        z: integer >>
+        v: vec3 >>
         tag!(">") >>
-        (Vec3 { x, y, z }))
+        (v)
+    )
 );
 
 named!(
     acceleration<&str, Vec3>,
     do_parse!(
         tag!("a=<") >>
-        x: integer >>
-        tag!(",") >>
-        y: integer >>
-        tag!(",") >>
-        z: integer >>
+        v: vec3 >>
         tag!(">") >>
-        (Vec3 { x, y, z }))
+        (v)
+    )
 );
 
 named!(
@@ -87,8 +91,12 @@ named!(
 );
 
 fn run1() {
-    let res = particle("p=<-1724,-1700,5620>, v=<44,-10,-107>, a=<2,6,-9>");
-    println!("{:?}",res);
+    let mut particles: Vec<Particle> = Vec::new();
+    for line in INPUT.lines() {
+        let particle = particle(line.trim());
+        println!("{:?}", particle);
+        particles.push(particle.unwrap().1);
+    }
 }
 
 fn run2() {
