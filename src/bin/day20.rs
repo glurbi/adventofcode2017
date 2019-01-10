@@ -16,9 +16,9 @@ fn day1() {
 
 #[derive(Debug)]
 struct Vec3 {
-    x: i32,
-    y: i32,
-    z: i32,
+    x: i64,
+    y: i64,
+    z: i64,
 }
 
 #[derive(Debug)]
@@ -28,14 +28,31 @@ struct Particle {
     a: Vec3,
 }
 
+impl Particle {
+
+    fn step(&mut self) {
+        self.v.x += self.a.x;
+        self.v.y += self.a.y;
+        self.v.z += self.a.z;
+        self.p.x += self.v.x;
+        self.p.y += self.v.y;
+        self.p.z += self.v.z;
+    }
+
+    fn distance(&self) -> usize {
+        (self.p.x.abs() + self.p.y.abs() + self.p.z.abs()) as usize
+    }
+
+}
+
 named!(
-    integer<&str, i32>, flat_map!(
+    integer<&str, i64>, flat_map!(
     recognize!(
         tuple!(
             opt!(char!('-')),
             digit
     )),
-    parse_to!(i32)
+    parse_to!(i64)
 ));
 
 named!(
@@ -90,14 +107,62 @@ named!(
         (Particle { p, v, a }))
 );
 
-fn run1() {
+fn read_particles() -> Vec<Particle> {
     let mut particles: Vec<Particle> = Vec::new();
     for line in INPUT.lines() {
         let particle = particle(line.trim());
-        println!("{:?}", particle);
         particles.push(particle.unwrap().1);
     }
+    particles
+}
+
+fn run1() {
+
+    let mut particles = read_particles();
+
+    let mut closest_i = std::usize::MAX;
+    let mut closest_d = std::usize::MAX;
+    for _ in 0..1000 {
+
+        for i in 0..particles.len() {
+            let particle = &mut particles[i];
+            particle.step();
+        }
+
+        let mut dist = std::usize::MAX;
+        let mut index = std::usize::MAX;
+        for i in 0..particles.len() {
+            let particle = &particles[i];
+            if particle.distance() < dist {
+                index = i;
+                dist = particle.distance();
+            }
+        }
+
+        if closest_i != index {
+            println!("i={}, dist={}", closest_i, closest_d);
+        }
+
+        closest_i = index;
+        closest_d = dist;
+    }
+    println!("i={}, dist={}", closest_i, closest_d);
 }
 
 fn run2() {
+
+    let mut particles = read_particles();
+
+    for _ in 0..1000 {
+
+        for i in 0..particles.len() {
+            let particle = &mut particles[i];
+            particle.step();
+        }
+
+        for i in 0..particles.len() {
+        }
+
+    }
+
 }
