@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate nom;
 
+use std::collections::HashMap;
 use nom::{digit};
 
 const INPUT: &'static str = include_str!("../../input/Day20.txt");
@@ -14,14 +15,14 @@ fn day1() {
     run2();
 }
 
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 struct Vec3 {
     x: i64,
     y: i64,
     z: i64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Particle {
     p: Vec3,
     v: Vec3,
@@ -152,17 +153,29 @@ fn run1() {
 fn run2() {
 
     let mut particles = read_particles();
+    println!("initial count is {}", particles.len());
 
     for _ in 0..1000 {
 
+        let mut counts: HashMap<Vec3, usize> = HashMap::new();
         for i in 0..particles.len() {
             let particle = &mut particles[i];
             particle.step();
         }
 
-        for i in 0..particles.len() {
+        for particle in particles.iter() {
+            *counts.entry(particle.p).or_insert(0) += 1;
         }
 
+        let mut survivors: Vec<Particle> = Vec::new();
+        for i in 0..particles.len() {
+            let particle = particles[i];
+            if counts[&particle.p] == 1 {
+                survivors.push(particle);
+            }
+        }
+        particles = survivors;
     }
 
+    println!("survivor count is {}", particles.len());
 }
