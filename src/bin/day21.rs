@@ -54,7 +54,15 @@ impl Image {
         let mut hs: HashSet<Image> = HashSet::new();
         hs.insert(img.clone());
 
-        // horizontal
+        // rotate
+        let img_rot = img.rotate_left();
+        hs.insert(img_rot.clone());
+        let img_rot = img_rot.rotate_left();
+        hs.insert(img_rot.clone());
+        let img_rot = img_rot.rotate_left();
+        hs.insert(img_rot.clone());
+
+        // horizontal symetry
         let mut img1 = Image::new(img.size);
         for j in 0..img.size {
             for i in 0..img.size {
@@ -63,46 +71,38 @@ impl Image {
                 img1.set(i, new_j, c);
             }
         }
-        hs.insert(img1);
+        hs.insert(img1.clone());
 
-        // vertical
-        let mut img2 = Image::new(img.size);
-        for j in 0..img.size {
-            for i in 0..img.size {
-                let new_i = img.size - i - 1;
-                let c = img.get(i, j);
-                img2.set(new_i, j, c);
-            }
-        }
-        hs.insert(img2);
-
-        // central
-        let mut img3 = Image::new(img.size);
-        for j in 0..img.size {
-            for i in 0..img.size {
-                let new_i = img.size - i - 1;
-                let new_j = img.size - j - 1;
-                let c = img.get(i, j);
-                img3.set(new_i, new_j, c);
-            }
-        }
-        hs.insert(img3);
-
-        // rotate ???
-        let mut img_rot = img.clone();
-        for _ in 0..3 {
-            for j in 0..img.size {
-                for i in 0..img.size {
-                    let new_i = img.size - i - 1;
-                    let new_j = img.size - j - 1;
-                    let c = img.get(i, j);
-                    img_rot.set(new_i, new_j, c);
-                }
-            }
-            hs.insert(img_rot.clone());
-        }
+        // rotate
+        let img_rot = img1.rotate_left();
+        hs.insert(img_rot.clone());
+        let img_rot = img_rot.rotate_left();
+        hs.insert(img_rot.clone());
+        let img_rot = img_rot.rotate_left();
+        hs.insert(img_rot.clone());
 
         hs
+    }
+
+    fn rotate_left(&self) -> Image {
+        let mut res = self.clone();
+        if res.size == 3 {
+            res.set(0, 0, self.get(2, 0));
+            res.set(1, 0, self.get(2, 1));
+            res.set(2, 0, self.get(2, 2));
+            res.set(0, 1, self.get(1, 0));
+            res.set(1, 1, self.get(1, 1));
+            res.set(2, 1, self.get(1, 2));
+            res.set(0, 2, self.get(0, 0));
+            res.set(1, 2, self.get(0, 1));
+            res.set(2, 2, self.get(0, 2));
+        } else {
+            res.set(0, 0, self.get(1, 0));
+            res.set(1, 0, self.get(1, 1));
+            res.set(1, 1, self.get(0, 1));
+            res.set(0, 1, self.get(0, 0));
+        }
+        res
     }
 
     fn get_subimage(&self, i: usize, j: usize, size: usize) -> Image {
@@ -133,7 +133,7 @@ impl Image {
         for bj in 0..block_count {
             for bi in 0..block_count {
                 let sub = self.get_subimage(bi*old_block_size, bj*old_block_size, old_block_size);
-                println!("{:?}", sub);
+                //println!("{:?}", sub);
                 let sub = &rules.rules[&sub];
                 res.set_subimage(bi*new_block_size, bj*new_block_size, sub);
             }
@@ -182,6 +182,7 @@ impl Rules {
 
 fn main() {
     day1();
+    day2();
 }
 
 fn day1() {
@@ -192,10 +193,36 @@ fn day1() {
     //rules.insert(".#./..#/### => #..#/..../..../#..#");
     //println!("{:?}", rules);
 
+    //println!("{:?}", Image::equivalents(&image));
+    //println!("{:?}", image);
+    //println!("{:?}", image.rotate_left());
     println!("{:?}", image);
     image = image.step(&rules);
     println!("{:?}", image);
     image = image.step(&rules);
     println!("{:?}", image);
+    image = image.step(&rules);
+    println!("{:?}", image);
+    image = image.step(&rules);
+    println!("{:?}", image);
+    image = image.step(&rules);
+    println!("{:?}", image);
+
+    let s: Vec<u8> = image.content.iter().filter(|&c| *c == '#' as u8).cloned().collect();
+    println!("{}", s.len());
 }
 
+fn day2() {
+    let mut image = Image::init();
+    let rules = Rules::from_text(INPUT);
+
+    println!("{:?}", image);
+
+    for _ in 0..18 {
+        image = image.step(&rules);
+        println!("{:?}", image);
+    }
+
+    let s: Vec<u8> = image.content.iter().filter(|&c| *c == '#' as u8).cloned().collect();
+    println!("{}", s.len());
+}
