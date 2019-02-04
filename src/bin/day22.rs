@@ -24,14 +24,12 @@ impl Cluster {
         let new_height = self.height*3;
         let mut new_v = vec!['.' as u8; (new_width * new_height) as usize];
 
-        for i in 0..self.v.len() {
-            let x = i as i64 % self.width;
-            let y = i as i64 / self.width;
-            let new_x = self.width + x;
-            let new_y = self.height + y;
+        for i in 0..(self.v.len()/self.width as usize) {
+            let new_x = self.width;
+            let new_y = self.height + i as i64;
             let new_p = (new_x + new_y * new_width) as usize;
-            let p = (x + y * self.width) as usize;
-            new_v[new_p] = self.v[p];
+            let p = i * self.width as usize;
+            new_v[new_p..new_p+self.width as usize].clone_from_slice(&self.v[p..p+self.width as usize]);
         }
 
         self.vx = self.vx + self.width;
@@ -39,43 +37,92 @@ impl Cluster {
         self.width = new_width;
         self.height = new_height;
         self.v = new_v;
-        println!("vx={}, vy={}, dir={:?}, infections:{}", self.vx, self.vy, self.dir, self.infections);
+        //println!("vx={}, vy={}, dir={:?}, infections:{}", self.vx, self.vy, self.dir, self.infections);
     }
 
     fn is_infected(&self) -> bool {
         self[(self.vx, self.vy)] as char == '#'
     }
 
-    fn step(&mut self) {
+    fn turn_left(&mut self) {
+        self.dir = match self.dir {
+            N => W,
+            W => S,
+            S => E,
+            E => N,
+        };
+    }
+
+    fn turn_right(&mut self) {
+        self.dir = match self.dir {
+            N => E,
+            E => S,
+            S => W,
+            W => N,
+        };
+    }
+
+    fn reverse(&mut self) {
+        self.dir = match self.dir {
+            N => S,
+            E => W,
+            S => N,
+            W => E,
+        };
+    }
+
+    fn move_on(&mut self) {
+        match self.dir {
+            N => self.vy -= 1,
+            W => self.vx -= 1,
+            S => self.vy += 1,
+            E => self.vx += 1,
+        };
+    }
+
+    fn step_part1(&mut self) {
         let vx = self.vx;
         let vy = self.vy;
         if self.is_infected() {
-            self.dir = match self.dir {
-                N => W,
-                W => S,
-                S => E,
-                E => N,
-            };
+            self.turn_right();
             self[(vx, vy)] = '.' as u8;
         } else {
-            self.dir = match self.dir {
-                N => E,
-                E => S,
-                S => W,
-                W => N,
-            };
+            self.turn_left();
             self[(vx, vy)] = '#' as u8;
             self.infections += 1;
         }
-        match self.dir {
-            N => self.vy -= 1,
-            E => self.vx -= 1,
-            S => self.vy += 1,
-            W => self.vx += 1,
-        };
+        self.move_on();
         if self.vx < 0 || self.vy < 0 || self.vx >= self.width || self.vy >= self.height {
             self.increase_capacity();
         }        
+    }
+
+    fn step_part2(&mut self) {
+        let vx = self.vx;
+        let vy = self.vy;
+        match self[(vx, vy)] as char {
+            '#' => {
+                self.turn_right();
+                self[(vx, vy)] = 'F' as u8;
+            },
+            'F' => {
+                self.reverse();
+                self[(vx, vy)] = '.' as u8;
+            },
+            'W' => {
+                self[(vx, vy)] = '#' as u8;
+                self.infections += 1;
+            },
+            '.' => {
+                self.turn_left();
+                self[(vx, vy)] = 'W' as u8;
+            },
+            _ => panic!("Bug!"),
+        }
+        self.move_on();
+        if self.vx < 0 || self.vy < 0 || self.vx >= self.width || self.vy >= self.height {
+            self.increase_capacity();
+        }
     }
 }
 
@@ -118,8 +165,8 @@ fn main() {
     day2();
 }
 
-fn day1() {
-    let mut test_cluster = Cluster {
+fn create_test_cluster() -> Cluster {
+    Cluster {
         width: 3,
         height: 3,
         v: "..##.....".as_bytes().iter().cloned().collect(),
@@ -127,15 +174,11 @@ fn day1() {
         vy: 1,
         dir: N,
         infections: 0,
-    };
-    println!("{:?}", test_cluster);
-    for _ in 0..70 {
-        test_cluster.step();
-        //println!("{:?}", test_cluster);
     }
-    println!("{:?}", test_cluster);
+}
 
-    let mut actual_cluster = Cluster {
+fn create_actual_cluster() -> Cluster {
+    Cluster {
         width: 25,
         height: 25,
         v: INPUT.chars().filter(|c| !c.is_ascii_whitespace()).map(|c| c as u8).collect(),
@@ -143,32 +186,35 @@ fn day1() {
         vy: 12,
         dir: N,
         infections: 0,
-    };
-    println!("{:?}", actual_cluster);
+    }
+}
+
+fn day1() {
+    let mut test_cluster = create_test_cluster();
+    println!("{:?}", test_cluster);
+    for _ in 0..70 {
+        test_cluster.step_part1();
+    }
+    println!("{:?}", test_cluster);
+
+    let mut actual_cluster = create_actual_cluster();
     for _ in 0..10000 {
-        actual_cluster.step();
-        //println!("{:?}", test_cluster);
+        actual_cluster.step_part1();
     }
     println!("{}", actual_cluster.infections);
 }
 
 fn day2() {
-    let mut test_cluster = Cluster {
-        width: 3,
-        height: 3,
-        v: "..##.....".as_bytes().iter().cloned().collect(),
-        vx: 1,
-        vy: 1,
-        dir: N,
-        infections: 0,
-    };
+    let mut test_cluster = create_test_cluster();
     println!("{:?}", test_cluster);
-    for i in 0..100000 {
-        test_cluster.step();
-        if i % 10000 == 0 {
-            print!(".")
-        }
-        //println!("{:?}", test_cluster);
+    for _ in 0..100 {
+        test_cluster.step_part2();
     }
-    println!("{:?}", test_cluster);
+    println!("{}", test_cluster.infections);
+
+    let mut actual_cluster = create_actual_cluster();
+    for _ in 0..10000000 {
+        actual_cluster.step_part2();
+    }
+    println!("{}", actual_cluster.infections);
 }
