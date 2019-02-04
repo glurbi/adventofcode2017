@@ -9,11 +9,11 @@ enum Dir { N, S, E, W }
 use Dir::{ N, S, E, W };
 
 struct Cluster {
-    width: i32,
-    height: i32,
+    width: i64,
+    height: i64,
     v: Vec<u8>,
-    vx: i32,
-    vy: i32,
+    vx: i64,
+    vy: i64,
     dir: Dir,
     infections: usize,
 }
@@ -25,8 +25,8 @@ impl Cluster {
         let mut new_v = vec!['.' as u8; (new_width * new_height) as usize];
 
         for i in 0..self.v.len() {
-            let x = i as i32 % self.width;
-            let y = i as i32 / self.width;
+            let x = i as i64 % self.width;
+            let y = i as i64 / self.width;
             let new_x = self.width + x;
             let new_y = self.height + y;
             let new_p = (new_x + new_y * new_width) as usize;
@@ -39,6 +39,7 @@ impl Cluster {
         self.width = new_width;
         self.height = new_height;
         self.v = new_v;
+        println!("vx={}, vy={}, dir={:?}, infections:{}", self.vx, self.vy, self.dir, self.infections);
     }
 
     fn is_infected(&self) -> bool {
@@ -91,10 +92,10 @@ impl fmt::Debug for Cluster {
     }
 }
 
-impl Index<(i32,i32)> for Cluster {
+impl Index<(i64,i64)> for Cluster {
     type Output = u8;
 
-    fn index(&self, (x,y): (i32,i32)) -> &u8 {
+    fn index(&self, (x,y): (i64,i64)) -> &u8 {
         if x < 0 || y < 0 || x >= self.width || y >= self.height {
             &('.' as u8)            
         } else {
@@ -104,9 +105,9 @@ impl Index<(i32,i32)> for Cluster {
     }
 }
 
-impl IndexMut<(i32,i32)> for Cluster {
+impl IndexMut<(i64,i64)> for Cluster {
 
-    fn index_mut(&mut self, (x,y): (i32,i32)) -> &mut u8 {
+    fn index_mut(&mut self, (x,y): (i64,i64)) -> &mut u8 {
         let p = (x + (y*self.width)) as usize;
         &mut self.v[p]
     }
@@ -152,4 +153,22 @@ fn day1() {
 }
 
 fn day2() {
+    let mut test_cluster = Cluster {
+        width: 3,
+        height: 3,
+        v: "..##.....".as_bytes().iter().cloned().collect(),
+        vx: 1,
+        vy: 1,
+        dir: N,
+        infections: 0,
+    };
+    println!("{:?}", test_cluster);
+    for i in 0..100000 {
+        test_cluster.step();
+        if i % 10000 == 0 {
+            print!(".")
+        }
+        //println!("{:?}", test_cluster);
+    }
+    println!("{:?}", test_cluster);
 }
