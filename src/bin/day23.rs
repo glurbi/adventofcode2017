@@ -1,6 +1,7 @@
 use InstructionType::{SET,SUB,MUL,JNZ};
 
 const INPUT: &'static str = include_str!("../../input/Day23.txt");
+const INPUT_OPT: &'static str = include_str!("../../input/Day23-opt.txt");
 
 fn main() {
     day23();
@@ -55,7 +56,7 @@ struct Prog {
 
 #[derive(Debug)]
 struct VirtualMachine {
-    regs: [i64; 26],
+    regs: [i64; 8],
     ip: i64,
     mul_count: usize,
     step_count: usize,
@@ -64,7 +65,7 @@ struct VirtualMachine {
 impl VirtualMachine {
     fn new() -> VirtualMachine {
         VirtualMachine {
-            regs: [0; 26],
+            regs: [0; 8],
             ip: 0,
             mul_count: 0,
             step_count: 0,
@@ -144,12 +145,17 @@ impl Prog {
     }
 
     fn run(&self, vm: &mut VirtualMachine) {
-        while self.step(vm) {}
+        while self.step(vm) {
+            //if vm.step_count % 1000000 == 0 {
+                println!("{:?}", &vm);
+            //}
+        }
+        println!("{:?}", &vm);
     }
 }
 
 fn day23() {
-    part1();
+    //part1();
     part2();
 }
 
@@ -165,5 +171,14 @@ fn part1() {
 
 fn part2() {
     println!("Part 2");
+    let prog = Prog::from_text(&INPUT);
+    //let prog = Prog::from_text(&INPUT_OPT);
+    println!("{:?}", prog);
+    let mut vm = VirtualMachine::new();
+    vm.regs[0] = 1;
+    prog.run(&mut vm);
+    println!("step count={}", vm.step_count);
+    println!("mul count={}", vm.mul_count);
+    println!("reg h={}", vm.regs[7]);
 }
 
