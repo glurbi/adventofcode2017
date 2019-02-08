@@ -40,23 +40,24 @@ fn from_text(text: &str) -> Vec<Component> {
     components
 }
 
-fn combine_rec(mut v: Vec<Component>, port: i32, mut bag: Vec<Component>, res: &mut Vec<Component>, max_strength: &mut i32) {
+fn combine_rec(mut v: Vec<Component>, port: i32, mut bag: Vec<Component>, res: &mut Vec<Component>, max_strength: &mut i32, max_length: &mut usize) {
         let matching_components = bag.iter().filter(|c| c.p0 == port || c.p1 == port).cloned().collect::<Vec<Component>>();
-        if port == 3 {
-            //println!(">>>>>>>>>>>>>>>>>>>>> {:?}", matching_components);        
-        }
         for c in matching_components.clone() {
             let next_port = if c.p0 == port { c.p1 } else { c.p0 };
             v.push(c);
             bag.retain(|x| x.i != c.i);
             let strength = v.iter().fold(0, |sum, c| sum + c.p0 + c.p1);
+            let length = v.len();
             if strength > *max_strength {
-                println!("{} -> {:?}", strength, v);
-                //println!("{:?}", matching_components);
+                println!("STRENGTH {} -> {:?}", strength, v);
                 *max_strength = strength;
                 *res = v.clone();
             }
-            combine_rec(v.clone(), next_port, bag.clone(), res, max_strength);
+            if length >= *max_length {
+                println!("LENGTH {} -> STRENGTH {}", length, strength);
+                *max_length = length;
+            }
+            combine_rec(v.clone(), next_port, bag.clone(), res, max_strength, max_length);
             bag.push(v.pop().unwrap());
         }
 
@@ -65,12 +66,13 @@ fn combine_rec(mut v: Vec<Component>, port: i32, mut bag: Vec<Component>, res: &
 fn compute_strongest(components: &Vec<Component>) -> (i32, Vec<Component>) {
     let mut res = vec![];
     let mut max_strength = 0;
+    let mut max_length = 0;
     let start_components = components.iter().filter(|c| c.p0 == 0).cloned().collect::<Vec<Component>>();
     for start_comp in start_components {
         let mut bag = components.iter().filter(|x| x.i != start_comp.i).cloned().collect();
         let mut v = vec![start_comp];
         let mut port = start_comp.p1;
-        combine_rec(v, port, bag, &mut res, &mut max_strength);
+        combine_rec(v, port, bag, &mut res, &mut max_strength, &mut max_length);
     }
     (max_strength, res)
 }
